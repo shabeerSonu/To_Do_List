@@ -1,0 +1,51 @@
+{% include "header.html" %}
+{% from "bootstrap5/form.html" import render_form %}
+
+
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 bg-light p-4 rounded">
+            <h2 class="text-center mb-4"><u>To Do List</u></h2>
+            {% if not current_user.is_authenticated: %}
+                <p class="text-center">
+                    To add your to-do list, please
+                    <a href="{{ url_for('login') }}">login</a>.
+                    Don't have an account?
+                    <a href="{{ url_for('register') }}">Register</a>.
+                </p>
+            {% else %}
+                {% if all_data %}
+                <ul>
+                    {% for data in all_data %}
+                        <li>
+                            {{ data.task | safe }} - ({{data.date}})
+                                <a href="{{ url_for('delete_task', task_id=data.id) }}" class="btn btn-light">❌</a>
+                                <a href="{{ url_for('strike', task_id=data.id) }}" class="btn btn-light">✔️</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <p>No task has added yet.</p>
+                {% endif %}
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p class="alert alert-info">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Login form -->
+                <div class="mb-3 text-center">
+                    <form method="post" action="{{ url_for('add_task') }}" novalidate>
+                        {{ render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% include "footer.html" %}
